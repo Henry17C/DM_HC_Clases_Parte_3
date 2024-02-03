@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "148130208588",
+    "project_id": "fir-app-8e042",
+    "storage_bucket": "fir-app-8e042.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:148130208588:android:182f1003bbeca8f2f74de9",
+        "android_client_info": {
+          "package_name": "com.examenp.biometricapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy5p2lTBsKOrDJz24eU6I0dFb9EuHlcgI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -6,6 +6,28 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <EditText
+        android:id="@+id/textUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginBottom="96dp"
+        app:layout_constraintBottom_toTopOf="@id/textPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.473"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/textPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginBottom="124dp"
+        app:layout_constraintBottom_toTopOf="@id/txtInfo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <TextView
         android:id="@+id/txtInfo"
         android:layout_width="wrap_content"
@@ -19,13 +41,39 @@
 
     <ImageView
         android:id="@+id/imgFinger"
-        android:layout_width="259dp"
-        android:layout_height="341dp"
-    android:visibility="invisible"
+        android:layout_width="202dp"
+        android:layout_height="181dp"
         android:layout_marginTop="48dp"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/finger" />
+        app:srcCompat="@drawable/fing" />
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/txtInfo"
+    >
+    <Button
+        android:id="@+id/btnSaveUser"
+        android:layout_margin="20dp"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="Guardar" />
+    <Button
+        android:id="@+id/btnSignUser"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="Ingresar" />
+
+
+</LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

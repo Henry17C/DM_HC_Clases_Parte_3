@@ -1,29 +1,35 @@
 package com.examenp.biometricapp
-
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.provider.Settings
 import android.util.Log
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import com.examenp.biometricapp.databinding.ActivityMainBinding
 import com.examenp.biometricapp.viewmodels.MainViewModel
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+
 import java.util.concurrent.Executor
 
 class MainActivity : AppCompatActivity() {
 
+      lateinit var binding: ActivityMainBinding
+
+    private lateinit var auth: FirebaseAuth ///FIREBASE
 
     private val mainViewModel: MainViewModel by viewModels()
 
-    private lateinit var btnFinger: ImageView
-    private lateinit var  txtInfo: TextView
+//    private lateinit var btnFinger: ImageView
+//   private lateinit var  txtInfo: TextView
 
     private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
@@ -32,7 +38,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // Initialize Firebase Auth
+        auth = Firebase.auth
         initListeners()
         initObservables()
         AutificationVaribles()
@@ -41,17 +51,43 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    public override fun onStart() {
+        super.onStart()
+        // Check if user is signed in (non-null) and update UI accordingly.
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+           // startActivity(Intent(this@MainActivity,MainActivity2::class.java))
+            binding.textUser.visibility= View.GONE
+            binding.textPassword.visibility= View.GONE
 
+            binding.imgFinger.visibility=View.VISIBLE
+            binding.txtInfo.text=getString(R.string.biometric_succes)
+
+
+        }else{
+            binding.imgFinger.visibility= View.GONE
+            binding.txtInfo.text=getString(R.string.no_user)
+        }
+    }
 
     private fun initListeners(){
 
-         btnFinger= findViewById<ImageView>(R.id.imgFinger)
-        txtInfo= findViewById(R.id.txtInfo)
 
-        btnFinger.setOnClickListener{
+        binding.imgFinger
+        binding.imgFinger.setOnClickListener{
             biometricPrompt.authenticate(promptInfo)
 
         }
+
+        binding.btnSaveUser.setOnClickListener {
+            createNewUsers(binding.textUser.text.toString(), binding.textPassword.text.toString())
+        }
+        binding.btnSignUser.setOnClickListener {
+
+            SignInUsers(binding.textUser.text.toString(),binding.textPassword.text.toString())
+
+        }
+
     }
 
     private fun AutificationVaribles(){
@@ -80,14 +116,16 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.resultCheckBiometric.observe(this){code->
             when(code){
                BiometricManager.BIOMETRIC_SUCCESS->{
-                   btnFinger.visibility= View.VISIBLE
-                   txtInfo.text=getString(R.string.biometric_succes)
+
+                   binding.imgFinger.visibility= View.VISIBLE
+                   binding.txtInfo
+                   binding.txtInfo.text=getString(R.string.biometric_succes)
 
                }
 
                 BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE->{
 
-                    txtInfo.text = getString(R.string.biometric_no_hardware)
+                    binding.txtInfo.text = getString(R.string.biometric_no_hardware)
        
                 }
 
@@ -101,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                     val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
                         putExtra(
                             Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-                            BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                            BIOMETRIC_STRONG or DEVICE_CREDENTIAL
                         )
                     }
                     startActivityForResult(enrollIntent, 100)
@@ -110,6 +148,44 @@ class MainActivity : AppCompatActivity() {
                }
             }
         }
+
+
+    private fun createNewUsers(user:String, password:String){
+        auth.createUserWithEmailAndPassword(user,password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
+                    Log.d("TAG", "createUserWithEmail:success")
+                    val user = auth.currentUser
+                    Snackbar.make(this,binding.textUser,"CreateUserWithEmail: Success",Snackbar.LENGTH_LONG).show()
+                    binding.textUser.text.clear()
+                    binding.textPassword.text.clear()
+
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Snackbar.make(this,binding.textUser,task.exception!!.message.toString(),Snackbar.LENGTH_LONG).show()
+
+                }
+            }
+    }
+
+
+
+    private fun SignInUsers(email:String,password:String){
+
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    startActivity(Intent(this@MainActivity,MainActivity2::class.java))
+                } else {
+                    // If sign in fails, display a message to the user.
+                    Log.w("TAG", "signInWithEmail:failure", task.exception)
+                    Snackbar.make(this,binding.textUser,"signInWithEmail:failure",Snackbar.LENGTH_LONG).show()
+
+                }
+            }
+    }
 
     }
 
